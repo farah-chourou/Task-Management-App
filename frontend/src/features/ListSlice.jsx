@@ -3,7 +3,7 @@ import axios from "axios"
 
 
 const ListSlice = createSlice({
- name:"COLLICTION_TODO",
+ name:"COLLECTION_TODO",
  initialState:{
     list:[]
  },
