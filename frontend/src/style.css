@@ -1,0 +1,46 @@
+.toDo{
+    /*background-color: #C67804;*/
+    background-color: white;
+
+    margin: 5px;
+    border: 1px black solid;
+    border-radius: 10px;
+    color: black;
+    padding: 5px 10px 5px;
+    font-size: 20px;
+    font-family: "Patrick Hand";
+    min-height: 50px;
+    
+}
+
+.list{
+margin: auto;
+margin-top: 10px;
+width:650px;
+background-color: rgba(194, 187, 178, 0.548);
+}
+.add{
+    margin: auto;
+    margin-bottom: 20px;
+    width:600px;
+    }
+
+.checkBox{
+    margin-top:15px;
+    width:23px;
+    height:23px
+}    
+
+h1{
+    font-family: "Patrick Hand";
+
+}
+
+.collection{
+    height: 170px;
+    background-color: rgb(223, 214, 231);
+}
+.collection:hover {
+    background-color: rgb(182, 168, 196);
+
+}
