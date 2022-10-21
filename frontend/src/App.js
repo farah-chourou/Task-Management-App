@@ -4,6 +4,7 @@ import AddToDo from './components/AddToDo';
 import "./style.css";
 import Lists from "./components/Lists";
 import  Login from "./components/Auth/Login";
+import Register from "./components/Auth/Register";
 
 function App() {
 
@@ -11,6 +12,8 @@ function App() {
   <Router>
     <Routes>
         <Route   path='/' element={<Login/>}>
+        </Route>
+        <Route   path='/register' element={<Register/>}>
         </Route>
         <Route   path='/toDo' element={<ToDoList/>}>
         </Route>

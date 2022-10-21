@@ -22,6 +22,7 @@ const validationLogin = Joi.object({
 } )
 
 router.post("/register",  async(req,res)=>{
+    console.log(req.body)
 
     const validation =  validationRegister.validate(req.body);
     if(validation.error) return res.status(400).send(validation.error.details[0].message)
@@ -43,7 +44,10 @@ router.post("/register",  async(req,res)=>{
  
     try {
         const savedUser = await user.save()
-        res.status(200).send(savedUser)
+        //normalement nasna3 access token valide lwa9t s8iir barka baad ylogini aala rou7ou
+        const accessToken = await user.createAccessToken()
+        const refreshToken = await user.createRefreshToken()
+        return res.status(201).header( 'authorization' , {accessToken,refreshToken} ).send( {accessToken,refreshToken} ) ;
     } catch (error) {
         res.status(400).send(error)
         
@@ -53,8 +57,6 @@ router.post("/register",  async(req,res)=>{
 
  
 router.post("/login", async (req, res) => {
-    console.log(req.body.email)
-    console.log(req.body.password)
 
 
     const validation =  await validationLogin.validate(req.body);
@@ -73,7 +75,7 @@ router.post("/login", async (req, res) => {
 
     const accessToken = await user.createAccessToken()
     const refreshToken = await user.createRefreshToken()
-    return res.status(201).header( 'auth-token' , {accessToken,refreshToken} ).send( {accessToken,refreshToken} ) ;
+    return res.status(201).header( 'authorization' , {accessToken,refreshToken} ).send( {accessToken,refreshToken} ) ;
     
     //  res.status(200).send("user is logged in  ")
 
@@ -83,6 +85,7 @@ router.post("/login", async (req, res) => {
 
 router.get("/me", verifyToken, async (req, res) => {
   return res.send(req.user)
+  console.log("step 1 ")
 
 })
 
@@ -90,7 +93,6 @@ router.get("/me", verifyToken, async (req, res) => {
 router.post("/refreshtoken", async (req,res) =>{
     try{ 
       const refreshToken =  req.headers.authorization.split(" ")[1];
-      console.log("refTo "+ refreshToken)
       if (!refreshToken ) {
         return res.status(403).json({ error: "Access denied,token missing!" });
       } else {
@@ -110,7 +112,6 @@ router.post("/refreshtoken", async (req,res) =>{
         }
       }
     } catch (error) {
-      console.error(error);
       return res.status(500).json({ error: "Internal Server Error!" });
     }
 })

@@ -1,85 +1,63 @@
 import React, { useState , useRef} from 'react'
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios"
 import { useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import {userLogin} from  "../../features/authSlice"
+import * as yup from 'yup';
+
+    
+const schema = yup.object({
+  email: yup.string().required("email is required").email("invalid email"),
+  password: yup.string().required('Password is required')
+})
+
 function Login() {
-    const [Email, setEmail] = useState("")
-    const [Password, setPassword] = useState("")
+
     const refInput = useRef(null)
     const navigate = useNavigate()
+    const { isLoggedIn } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
 
-    async function   login  (){
-      refInput.current.focus()
-    try {
-        const response = await  axios.post('http://localhost:3001/user/login', {email : Email, password : Password})
-        const refreshToken = response.data.refreshToken
-        localStorage.setItem("refreshToken", refreshToken)
-        localStorage.setItem("accessToken", response.data.accessToken)
+    const { register, handleSubmit, formState:{ errors } } = useForm({
+      resolver: yupResolver(schema)
+    });
+    const onLogin = (data) =>{
+      console.log(data.email)
+      console.log(data.password)
+      dispatch(userLogin( {email: data.email, password: data.password} ))
 
-        console.log(response.data.accessToken)
-        //sets authorization headers for all requests
-        axios.defaults.headers.common['authorization'] = `Bearer ${response.data.accessToken}`;
-
-      //  await  loadUser()
-       // navigate('/list')
-        
-    } catch (error) {
-        console.log(error)
-        
-    }
-
-    }
-    axios.interceptors.response.use((response) => {
-      return response
-    }, async function (error) {
-      console.log("step1")
-      const originalRequest =  error.config;
-       console.log(originalRequest._retry)
-      if (error.config.url != "http://localhost:3001/user/refreshtoken" && error.response.status === 401 && !originalRequest._retry) {
-          originalRequest._retry =   true;
-          console.log("step2")
-          const refreshToken= localStorage.getItem("refreshToken")
-          console.log(refreshToken)
-          axios.defaults.headers.common['authorization'] = await `Bearer ${refreshToken}`;
-          console.log(`Bearer ${refreshToken}`);
-          await axios.post('http://localhost:3001/user/refreshtoken').then((response) => {
-            // TODO: mettre à jour l'accessToken dans le localStorage
-            console.log("step3")
-         
-            originalRequest.headers['authorization'] = `Bearer ${response.data.accessToken}` ;
-            axios.defaults.headers.common['authorization'] = `Bearer ${response.data.accessToken}`; 
-            console.log(`Bearer ${response.data.accessToken}`)
-
-          })
-          return axios(originalRequest);
-        
-      }
-      return Promise.reject(error);
-    }); 
+    } 
+  
 
     const loadUser = async () => {
-     try{
-      const response =  await axios.get("http://localhost:3001/user/me")
-      console.log(response.data)
-
-     }catch(e){
-      console.log(e)
+      try{
+       const response =  await axios.get("http://localhost:3001/user/me")
+       console.log(response.data)
+ 
+      }catch(e){
+       console.log(e)
+      }
      }
-    }
-   
-
-   
   return (
     <div>
         <h1> Login </h1> 
+      <form onSubmit={handleSubmit(onLogin)}>
 
-        <input type="email"  ref={refInput} name='Email' onChange={(e)=> setEmail(e.target.value)}/> <br></br> 
-        <input type="password"  name='Password' onChange={(e) => setPassword(e.target.value)}/>
-        <button onClick={login}> log in </button>
+      <input {...register("email")}  className={`form-control ${errors.email ? 'is-invalid' : ''}`}/>
+      <p  className="invalid-feedback">{errors.email?.message}</p>
 
-        <button onClick={loadUser}> me </button>
+
+      <input type="password" {...register("password")} className={`form-control ${errors.password ? 'is-invalid' : ''}`} />
+      <p  className="invalid-feedback">{errors.password?.message}</p>
+
+      <button onClick={loadUser}> me </button>
 
         
 
+        <input type="submit" />
+    </form>
 
      
 
